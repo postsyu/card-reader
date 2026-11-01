@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>カードよみあげ</title>
+<style>
+:root{--bg:#fff8ec;--fg:#2b2b2b;--card:#fff;--en:#1c7ed6;--ja:#e8590c;--ac2:#f1e3cc;--mut:#8a7a62;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1a16;--fg:#f3ece0;--card:#2a251f;--en:#4dabf7;--ja:#ff8a4c;--ac2:#3a332a;--mut:#a89a82;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1d1a16;--fg:#f3ece0;--card:#2a251f;--en:#4dabf7;--ja:#ff8a4c;--ac2:#3a332a;--mut:#a89a82;color-scheme:dark}
+*{box-sizing:border-box;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;display:flex;flex-direction:column;align-items:center;padding:16px;gap:14px;overflow:hidden}
+.top{display:flex;gap:12px;width:100%;max-width:760px}
+.top button{flex:1;border:4px solid transparent;border-radius:22px;font-size:34px;font-weight:800;padding:22px 8px;color:#fff;opacity:.45}
+.top button.on{opacity:1;border-color:var(--fg)}
+#b-en{background:var(--en)}#b-ja{background:var(--ja)}
+.card{flex:1;width:100%;max-width:760px;background:var(--card);border-radius:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;text-align:center;position:relative}
+.n{position:absolute;top:14px;left:20px;color:var(--mut);font-size:22px}
+.txt{font-size:clamp(40px,10vw,84px);font-weight:800;line-height:1.3;word-break:break-word}
+.sub{font-size:clamp(28px,6vw,48px);color:var(--mut);font-weight:700;line-height:1.3;word-break:break-word}
+.ico{font-size:110px}
+.row{display:flex;gap:12px;width:100%;max-width:760px}
+.row button{flex:1;border:0;border-radius:22px;font-size:30px;font-weight:800;padding:26px 8px;background:var(--ac2);color:var(--fg)}
+.row button.main{background:var(--fg);color:var(--bg);flex:2}
+#gear{position:fixed;top:calc(env(safe-area-inset-top,0px) + 6px);right:8px;font-size:26px;opacity:.25;padding:10px;background:none;border:0;color:var(--fg)}
+#panel{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:5}
+#panel.open{display:flex}
+#panel .box{background:var(--card);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:18px;font-size:22px;min-width:280px}
+#panel label{display:flex;align-items:center;justify-content:space-between;gap:16px}
+#panel select{font-size:22px;padding:8px;border-radius:10px}
+#panel input[type=checkbox]{width:30px;height:30px}
+#panel button{border:0;border-radius:16px;font-size:24px;font-weight:700;padding:14px;background:var(--fg);color:var(--bg)}
+</style>
+</head>
+<body>
+<button id="gear" aria-label="せってい">⚙</button>
+
+<div class="top">
+  <button id="b-en" class="on">えいご</button>
+  <button id="b-ja">にほんご</button>
+</div>
+
+<div class="card" id="card">
+  <div class="n" id="n"></div>
+  <div class="ico" id="ico">🔊</div>
+  <div class="txt" id="txt"></div>
+  <div class="sub" id="sub"></div>
+</div>
+
+<div class="row">
+  <button id="again">もういちど</button>
+  <button id="next" class="main">スタート ▶</button>
+</div>
+<div class="row">
+  <button id="auto">じどう ▶</button>
+</div>
+
+<div id="panel">
+  <div class="box">
+    <label>もじを みせる <input type="checkbox" id="show"></label>
+    <label>かんかく
+      <select id="gap"><option value="3">3びょう</option><option value="5" selected>5びょう</option><option value="8">8びょう</option><option value="12">12びょう</option></select>
+    </label>
+    <label>はやさ
+      <select id="rate"><option value="0.6">ゆっくり</option><option value="0.8" selected>ふつう</option><option value="1">はやい</option></select>
+    </label>
+    <button id="close">とじる</button>
+  </div>
+</div>
+
+<script>
+var C=[["Hello.","こんにちは。"],["Good morning.","おはようございます。"],["Good afternoon.","こんにちは。"],["Good evening.","こんばんは。"],["Good night.","おやすみなさい。"],["Good-bye.","さようなら。"],["Nice to meet you.","はじめまして。"],["How are you?","ごきげんいかが？"],["I’m fine, thank you.","げんきです、ありがとう。"],["Thank you.","ありがとう。"],["You’re welcome.","どういたしまして。"],["I’m sorry.","ごめんなさい。"],["Excuse me.","すみません。"],["Congratulations!","おめでとう！"],["Merry Christmas!","めりーくりすます！"],["Happy birthday!","たんじょうびおめでとう！"],["Happy New Year!","あけましておめでとう！"],["It’s sweet.","あまい。"],["It’s sour.","すっぱい。"],["Smells good.","いいにおい。"],["Tastes good.","おいしい。"],["It’s cute.","かわいい。"],["It’s fun!","たのしいな！"],["I’m hungry.","おなかがすいた。"],["I’m full.","おなかいっぱい。"],["I’m sick.","ぐあいがわるい。"],["I’m sleepy.","ねむたい。"],["It’s sunny.","はれてる。"],["It’s cloudy.","くもってる。"],["It’s rainy.","あめがふってる。"],["Look!","みて！"],["Wait!","まって！"],["Wake up!","おきて！"],["Be quiet!","しずかに！"],["Hurry up!","はやく！"],["Come here.","こっちにきて。"],["Come in.","はいって。"],["Please help me.","てつだってください。"],["Let’s go.","さあ、いこう。"],["Let’s eat.","さあ、たべよう。"],["Let me help.","てつだいます。"],["Let me try.","ぼくにやらせて。"],["Be careful.","きをつけて。"],["Cheer up.","げんきだして。"],["Go ahead.","おさきにどうぞ。"],["Are you okay?","だいじょうぶ？"]];
+
+var mode="en",deck=[],pos=-1,timer=null,auto=false,voices=[],lock=null;
+var $=function(i){return document.getElementById(i)};
+
+function loadVoices(){voices=(window.speechSynthesis&&speechSynthesis.getVoices())||[]}
+if(window.speechSynthesis){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}
+
+function keepAwake(){try{if(navigator.wakeLock){navigator.wakeLock.request("screen").then(function(l){lock=l}).catch(function(){})}}catch(e){}}
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"&&pos>=0)keepAwake()});
+
+function pickVoice(lang){
+  var l=voices.filter(function(v){return v.lang.replace("_","-").indexOf(lang)===0});
+  if(!l.length)return null;
+  var rank=function(v){var n=v.name.toLowerCase();return(n.indexOf("premium")>-1||n.indexOf("enhanced")>-1||n.indexOf("siri")>-1)?0:1};
+  l.sort(function(a,b){return rank(a)-rank(b)});
+  return l[0];
+}
+
+function shuffle(last){
+  var a=C.map(function(_,i){return i});
+  for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}
+  if(last!==undefined&&a[0]===last){var k=1+Math.floor(Math.random()*(a.length-1));var t2=a[0];a[0]=a[k];a[k]=t2}
+  return a;
+}
+
+function say(cb){
+  var c=C[deck[pos]];
+  var text=mode==="en"?c[0]:c[1];
+  if(!window.speechSynthesis){if(cb)cb();return}
+  speechSynthesis.cancel();
+  var u=new SpeechSynthesisUtterance(text);
+  u.lang=mode==="en"?"en-US":"ja-JP";
+  var v=pickVoice(u.lang);if(v)u.voice=v;
+  u.rate=parseFloat($("rate").value);
+  var done=false;
+  var fin=function(){if(done)return;done=true;if(cb)cb()};
+  u.onend=fin;u.onerror=fin;
+  speechSynthesis.speak(u);
+}
+
+function render(){
+  var c=C[deck[pos]];
+  $("n").textContent=(pos+1)+" / "+C.length;
+  if(mode==="ja"){
+    // 答え合わせ用: 日本語と対応する英語を常に表示
+    $("ico").style.display="none";
+    $("txt").textContent=c[1];
+    $("sub").textContent=c[0];
+  }else{
+    var show=$("show").checked;
+    $("ico").style.display=show?"none":"block";
+    $("txt").textContent=show?c[0]:"";
+    $("sub").textContent=show?c[1]:"";
+  }
+}
+
+function next(cb){
+  if(pos<0||pos>=deck.length-1){var last=deck.length?deck[deck.length-1]:undefined;deck=shuffle(last);pos=0}
+  else pos++;
+  $("next").textContent="つぎ ▶";
+  keepAwake();
+  render();say(cb);
+}
+
+function loop(){
+  if(!auto)return;
+  clearTimeout(timer);
+  timer=setTimeout(function(){if(auto)next(loop)},parseInt($("gap").value,10)*1000);
+}
+
+function manualNext(){clearTimeout(timer);next(auto?loop:null)}
+
+$("next").onclick=manualNext;
+$("card").onclick=manualNext;
+$("again").onclick=function(){if(pos<0)return next();clearTimeout(timer);render();say(auto?loop:null)};
+$("auto").onclick=function(){
+  auto=!auto;
+  $("auto").textContent=auto?"■ とめる":"じどう ▶";
+  $("auto").className=auto?"main":"";
+  if(auto){clearTimeout(timer);next(loop)}else{clearTimeout(timer);if(window.speechSynthesis)speechSynthesis.cancel()}
+};
+function setMode(m){
+  mode=m;
+  $("b-en").className=m==="en"?"on":"";
+  $("b-ja").className=m==="ja"?"on":"";
+  if(pos>=0){clearTimeout(timer);render();say(auto?loop:null)}
+}
+$("b-en").onclick=function(){setMode("en")};
+$("b-ja").onclick=function(){setMode("ja")};
+$("show").onchange=function(){if(pos>=0)render()};
+
+// 設定: 右上の⚙を3秒長押し
+var gt=null;
+function gStart(e){e.preventDefault();gt=setTimeout(function(){$("panel").className="open"},3000)}
+function gEnd(){clearTimeout(gt)}
+$("gear").addEventListener("touchstart",gStart,{passive:false});
+$("gear").addEventListener("touchend",gEnd);
+$("gear").addEventListener("touchcancel",gEnd);
+$("gear").addEventListener("mousedown",gStart);
+$("gear").addEventListener("mouseup",gEnd);
+$("gear").addEventListener("mouseleave",gEnd);
+$("close").onclick=function(){$("panel").className=""};
+
+// ダブルタップ拡大・ピンチ拡大を防ぐ
+document.addEventListener("gesturestart",function(e){e.preventDefault()});
+render=(function(r){return function(){if(pos<0)return;r()}})(render);
+$("n").textContent="";
+</script>
+</body>
+</html>
