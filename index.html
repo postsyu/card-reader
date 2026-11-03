@@ -59,7 +59,6 @@ body{background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Ma
 
 <div id="panel">
   <div class="box">
-    <label>もじを みせる <input type="checkbox" id="show"></label>
     <label>かんかく
       <select id="gap"><option value="3">3びょう</option><option value="5" selected>5びょう</option><option value="8">8びょう</option><option value="12">12びょう</option></select>
     </label>
@@ -121,10 +120,9 @@ function render(){
     $("txt").textContent=c[1];
     $("sub").textContent=c[0];
   }else{
-    var show=$("show").checked;
-    $("ico").style.display=show?"none":"block";
-    $("txt").textContent=show?c[0]:"";
-    $("sub").textContent=show?c[1]:"";
+    $("ico").style.display="none";
+    $("txt").textContent=c[0];
+    $("sub").textContent=c[1];
   }
 }
 
@@ -161,7 +159,6 @@ function setMode(m){
 }
 $("b-en").onclick=function(){setMode("en")};
 $("b-ja").onclick=function(){setMode("ja")};
-$("show").onchange=function(){if(pos>=0)render()};
 
 // 設定: 右上の⚙を3秒長押し
 var gt=null;
