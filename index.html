@@ -56,6 +56,7 @@ body{background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Ma
 <div class="row">
   <button id="again">もういちど</button>
   <button id="auto">じどう ▶</button>
+  <button id="reset">はじめから</button>
 </div>
 
 <div id="panel">
@@ -146,6 +147,20 @@ function manualNext(){clearTimeout(timer);next(auto?loop:null)}
 $("next").onclick=manualNext;
 $("card").onclick=manualNext;
 $("again").onclick=function(){if(pos<0)return next();clearTimeout(timer);render();say(auto?loop:null)};
+$("reset").onclick=function(){
+  if(!confirm("はじめからにする？"))return;
+  clearTimeout(timer);
+  auto=false;
+  $("auto").textContent="じどう ▶";
+  $("auto").className="";
+  if(window.speechSynthesis)speechSynthesis.cancel();
+  deck=[];pos=-1;
+  $("n").textContent="";
+  $("txt").textContent="";
+  $("sub").textContent="";
+  $("ico").style.display="block";
+  $("next").textContent="スタート ▶";
+};
 $("auto").onclick=function(){
   auto=!auto;
   $("auto").textContent=auto?"■ とめる":"じどう ▶";
