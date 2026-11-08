@@ -24,6 +24,7 @@ body{background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Ma
 .row{display:flex;gap:12px;width:100%;max-width:760px}
 .row button{flex:1;border:0;border-radius:22px;font-size:30px;font-weight:800;padding:26px 8px;background:var(--ac2);color:var(--fg)}
 .row button.main{background:var(--fg);color:var(--bg);flex:2}
+.row button.big{font-size:clamp(44px,11vw,72px);padding:clamp(40px,9vh,80px) 8px;border-radius:32px}
 #gear{position:fixed;top:calc(env(safe-area-inset-top,0px) + 6px);right:8px;font-size:26px;opacity:.25;padding:10px;background:none;border:0;color:var(--fg)}
 #panel{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:5}
 #panel.open{display:flex}
@@ -50,10 +51,10 @@ body{background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Ma
 </div>
 
 <div class="row">
-  <button id="again">もういちど</button>
-  <button id="next" class="main">スタート ▶</button>
+  <button id="next" class="main big">スタート ▶</button>
 </div>
 <div class="row">
+  <button id="again">もういちど</button>
   <button id="auto">じどう ▶</button>
 </div>
 
